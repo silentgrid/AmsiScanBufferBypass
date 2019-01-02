@@ -34,10 +34,10 @@ namespace Bypass
 
             if (!VirtualProtect(ASBPtr, dwSize, 0x40, out Zero)) { return 1; }
 
-            Byte[] Patch = { 0x31, 0xff, 0x90 };
-            IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);
-            Marshal.Copy(Patch, 0, unmanagedPointer, 3);
-            MoveMemory(ASBPtr + 0x001b, unmanagedPointer, 3);
+            Byte[] Patch = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
+            IntPtr unmanagedPointer = Marshal.AllocHGlobal(6);
+            Marshal.Copy(Patch, 0, unmanagedPointer, 6);
+            MoveMemory(ASBPtr, unmanagedPointer, 6);
 
             return 0;
         }
