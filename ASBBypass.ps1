@@ -13,9 +13,6 @@ public class Win32 {
     [DllImport("kernel32")]
     public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
 
-    [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
-    static extern void MoveMemory(IntPtr dest, IntPtr src, int size);
-
 }
 "@
 
