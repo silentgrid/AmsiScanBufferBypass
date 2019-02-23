@@ -1,4 +1,4 @@
-## AmsiScanBufferBypass
+# AmsiScanBufferBypass
 
 ## Usage
 ### PowerShell
