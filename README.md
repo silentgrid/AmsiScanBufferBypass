@@ -38,8 +38,8 @@ GAC    Version        Location
 False  v4.0.30319     D:\Tools\ASBBypass\ASBBypass\bin\Release\ASBBypass.dll
 
 
-PS C:\Users\Daniel> [Amsi]::Bypass()
-PS C:\Users\Daniel> Invoke-Expression 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c1386'
+PS > [Amsi]::Bypass()
+PS > Invoke-Expression 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c1386'
 AMSI : The term 'AMSI' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
 At line:1 char:1
 + AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c1386
