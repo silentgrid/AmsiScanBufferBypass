@@ -50,5 +50,5 @@ At line:1 char:1
 
 Also works with `Assembly.Load` in .NET 4.8.
 
-{{< figure src="Image1.png" >}}
-{{< figure src="Image2.png" >}}
+![Without AMSI Bypass](Image1.png)
+![With AMSI Bypass](Image2.png)
